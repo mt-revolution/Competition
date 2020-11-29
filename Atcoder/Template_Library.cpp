@@ -148,6 +148,71 @@ double rec(int A, int B, int C, vector<vector<vector<double>>> &dp) {
 
 
 
+// 根付き木構造
+struct Tree {
+    vector<vector<int>> children;
+    vector<int> depth;
+    vector<int> parent;
+    
+    Tree(int N) { 
+        children.assign(N, vector<int>{});
+        depth.assign(N, -1);
+        parent.assign(N, -1);
+    }
+
+    // 子要素を追加
+    void add_child(int u, int v) {
+        children[u].push_back(v);
+        parent[v] = u;
+    }
+
+    // BFSで深さを計算
+    void calc_depth() {
+        int root;
+
+        // 根を求める
+        for (int i = 0; i < n; i++) {
+            if (parent[i] == -1) {
+                root = i;
+                break;
+            }
+        }
+
+        queue<int> node;
+        int u;
+
+        depth[root] = 0;
+        node.push(root);
+
+        while (node.empty() == false) {
+            u = node.front();
+            node.pop();
+
+            // u から行ける各頂点 v について再帰的に探索
+            for (auto v : children[u]) { 
+                if (depth[v] == -1) {
+                    depth[v] = depth[u] + 1;
+                    node.push(v);
+                }
+            }           
+        }
+    }
+
+    // 要素の種類を判定
+    string kind(int node) {
+        if (parent[node] == -1) {
+            return "root";
+        } else if (children[node].empty() == true) {
+            return "leaf";
+        } else {
+            return "internal node";
+        }
+    }
+};
+
+
+
+
 // 幅優先探索(最短距離の計算)
 struct bfs {
     vector<vector<int>> G;
