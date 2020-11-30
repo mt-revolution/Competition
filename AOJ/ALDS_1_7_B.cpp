@@ -6,22 +6,28 @@ int n;
 
 // 二分木構造
 struct BinaryTree {
-    vector<vector<int>> children;
+    vector<pair<int, int>> children;
     vector<int> depth;
     vector<int> height;
     vector<int> parent;
     
     BinaryTree(int N) { 
-        children.assign(N, vector<int>{});
+        children.assign(N, pair<int, int>{-1, -1});
         depth.assign(N, -1);
         height.assign(N, -1);
         parent.assign(N, -1);
     }
 
     // 子要素を追加
-    void add_child(int u, int v) {
-        children[u].push_back(v);
-        parent[v] = u;
+    void add_child(int u, int v1, int v2) {
+        children[u] = make_pair(v1, v2);
+        if (v1 != -1) {
+            parent[v1] = u;   
+        }
+
+        if (v2 != -1) {
+            parent[v2] = u;   
+        }
     }
 
     // BFSで深さを計算
@@ -37,7 +43,7 @@ struct BinaryTree {
         }
 
         queue<int> node;
-        int u;
+        int u, v1, v2;
 
         depth[root] = 0;
         node.push(root);
@@ -47,19 +53,23 @@ struct BinaryTree {
             node.pop();
 
             // u から行ける各頂点 v について再帰的に探索
-            for (auto v : children[u]) { 
-                if (depth[v] == -1) {
-                    depth[v] = depth[u] + 1;
-                    node.push(v);
-                }
+            v1 = children[u].first;
+            if (depth[v1] == -1) {
+                depth[v1] = depth[u] + 1;
+                node.push(v1);
             }           
+            v2 = children[u].second;
+            if (depth[v2] == -1) {
+                depth[v2] = depth[u] + 1;
+                node.push(v2);
+            }  
         }
     }
 
     // BFSで高さを計算
     void calc_height() {
         for (int i = 0; i < n; i++) {
-            if (children[i].empty() == true) {
+            if (children[i].first == -1) {
                 queue<int> node;
                 int u, v;
 
@@ -87,7 +97,7 @@ struct BinaryTree {
     string type(int node) {
         if (parent[node] == -1) {
             return "root";
-        } else if (children[node].empty() == true) {
+        } else if (children[node].first == -1) {
             return "leaf";
         } else {
             return "internal node";
@@ -95,23 +105,42 @@ struct BinaryTree {
     }
 
     int sibling(int node) {
-        int answer = -1;
         if (parent[node] == -1) {
-            return answer;
+            return -1;
         }
 
-        for (auto i : children[parent[node]]) {
-            if (i != node) {
-                answer = i;
-                break;
-            }
-        }
+        int i1 = children[parent[node]].first;
+        int i2 = children[parent[node]].second;
 
-        return answer;
+        if (i1 == node) {
+            return i2;
+        } 
+        
+        return i1;
     }
 
     int degree(int node) {
-        return children[node].size();
+        if (children[node].first == -1) {
+            return 0;
+        }
+        if (children[node].second != -1) {
+            return 2;
+        }
+
+        return 1;
+    }
+
+    void Preorder(int s) {
+        if (s == -1) {
+            return;
+        }
+
+        int v1 = children[s].first;
+        int v2 = children[s].second;
+ 
+        cout << " " << s;
+        Preorder(v1);
+        Preorder(v2);
     }
 };
 
@@ -120,25 +149,18 @@ int main() {
     cin >> n;
 
     int node;
-    int k, u, v;
+    int u, v1, v2;
 
     BinaryTree Tree(n);
 
     for (int i = 0; i < n; i++) {
-        cin >> u;
-
-        for (int i = 0; i < 2; i++) {
-            cin >> v;
-            if (v == -1) {
-                continue;
-            }
-
-            Tree.add_child(u, v);
-        }
+        cin >> u >> v1 >> v2;   
+        Tree.add_child(u, v1, v2);
     }
 
-    Tree.calc_depth();
-    Tree.calc_height();
+    // Tree.calc_depth();
+    // Tree.calc_height();
+    // Tree.Preorder(0);
 
     for (int i = 0; i < n; i++) {
         cout << "node " << i << ": parent = " << Tree.parent[i] << ", sibling = " << Tree.sibling(i) << ", degree = " << Tree.degree(i) << ", depth = " << Tree.depth[i] << ", height = " << Tree.height[i] << ", " << Tree.type(i) << endl;
