@@ -3,8 +3,8 @@
 using namespace std;
 
 bool Queen_solve(vector<vector<char>> &board) {
-    vector<int> row = {};
-    vector<int> column = {};
+    vector<int> row;
+    vector<int> column;
     int tmp_row, tmp_column;
     vector<vector<int>> move = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
@@ -44,58 +44,36 @@ int main() {
 
     vector<vector<char>> board(8, vector<char>(8, '.'));
     vector<vector<char>> board_tmp;
-    vector<int> row = {};
-    vector<int> column = {};
-    vector<int> r(k), c(k);
-    int index;
-    bool continued = false;
+    vector<int> row;
+    vector<int> column;
+    vector<int> id_row(8, 0), id_column(8, 0);
+    int r,c;
 
     for(int i = 0; i < k; i++) {
-        cin >> r[i] >> c[i];
-        board[r[i]][c[i]] = 'Q';
+        cin >> r >> c;
+        id_row[r]++, id_column[c]++;
+        board[r][c] = 'Q';
     }
 
-    for(int i = 0; i < 8; i++) {
-        continued = false;
-
-        for(int j = 0; j < k; j++) {
-            if(i == r[j]) {
-                continued = true;
-                break;
-            }
+    // 初期設定に含まれない行と列を選択
+    for (int i = 0; i < 8; i++) {
+        if (id_row[i] == 0) {
+            row.push_back(i);
         }
-
-        if(continued == true) {
-            continue;
+        if (id_column[i] == 0) {
+            column.push_back(i);
         }
-        row.push_back(i);
     }
 
-    for(int i = 0; i < 8; i++) {
-        continued = false;
-
-        for(int j = 0; j < k; j++) {
-            if(i == c[j]) {
-                continued = true;
-                break;
-            }
-        }
-
-        if(continued == true) {
-            continue;
-        }
-        column.push_back(i);
-    }
-
+    // 解が見つかるまで行を基準に列を順列全探索
     do {
         board_tmp = board;
-        index = 0;
 
-        for(int i : row) {
-            board_tmp[i][column[index]] = 'Q';
-            index++;
+        for (int i = 0; i < row.size(); i++) {
+            board_tmp[row[i]][column[i]] = 'Q';
         }
 
+        // 現在の配置で条件を満たすか確認
         if(Queen_solve(board_tmp) == true) {
             break;
         }

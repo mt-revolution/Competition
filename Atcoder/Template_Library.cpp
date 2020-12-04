@@ -101,6 +101,60 @@ struct dfs {
 };
 
 
+// ダイクストラ
+struct Graph {
+    vector<vector<pair<int, long long>>> G;
+    vector<long long> distance;
+
+    Graph(int N) {
+        G.assign(N, vector<pair<int, long long>>{});
+        distance.assign(N, 1000000000);
+    };
+
+    void make_edge(int u, int v, long long dist) {
+        G[u].push_back(make_pair(v, dist));
+    }
+
+    void make_twoedge(int u, int v, long long dist) {
+        G[u].push_back(make_pair(v, dist));
+        G[v].push_back(make_pair(u, dist));
+    }
+
+    // ダイクストラ
+    void do_dijkstra(int s) {
+        // 優先度付き待ち行列を使って高速化
+		priority_queue<pair<long long, int>> Q;
+		int u;
+
+		// 初期条件
+        distance[s] = 0;
+		for(int v = 0; v < n; v++) {
+			Q.push(pair<long long, int>(distance[v], v));
+		}
+		
+		// ダイクストラ開始
+		// Qが空になるまで
+		while(Q.empty() == false) {
+			// Qの中で一番距離が小さい点uを取り出す
+			u = Q.top().second;
+			Q.pop();
+
+			// uから行けるvについて処理する
+			for(auto v : G[u]) {
+				if(distance[v.first] > distance[u] + v.second) {
+					distance[v.first] = distance[u] + v.second;
+					// 距離の小さい方から取り出すために負にしてQに記録
+					Q.push(pair<long long, int>(-distance[v.first], v.first));
+				}
+			}
+		}
+    }
+};
+
+
+
+
+
 int N,M,Q;
 vector<int> a,b,c,d;
 int answer = 0;
@@ -729,6 +783,121 @@ bool vector_finder(vector<int> vec, int number) {
     }
 }
 
+
+
+// おつりの枚数計算
+vector<int> coins = {25, 10, 5, 1};
+
+// 初期値
+int tmp = n;
+
+for (auto coin : coins) {
+    answer += tmp / coin;
+    tmp -= coin * (tmp / coin);
+}
+
+
+
+// KMP法
+// KMP法のtableを返す
+vector<int> KMP_table(string W) {
+    // tableの中で現在計算している位置
+    int i = 2;
+    // 現在見ている部分文字列の次の文字の位置
+    int j = 0;
+
+    vector<int> table(W.size());
+
+    table[0] = -1, table[1] = 0;
+
+    while (i < W.size()) {
+        if (W[i-1] == W[j]) {
+            table[i] = j+1;
+            i++, j++;
+        } else if (j > 0) {
+            j = table[j];
+        } else {
+            table[i] = 0;
+            i++;
+        }
+    }
+
+    return table;
+}
+
+
+// 文字列Sから文字列Wを検索するKMP法
+void KMP_search(string S, string W) {
+    // Sの現在検索中の開始位置
+    int m = 0;
+    // Wの現在位置
+    int i = 0;
+
+    vector<int> table = KMP_table(W);
+
+    while (m+i < S.size()) {
+        if (W[i] == S[m+i]) {
+            i++;
+
+            if (i == W.size()) {
+                cout << m << endl;
+                // 続けて出力する場合は以下も加える
+                i = 0;
+                m = m+i - table[i];
+            }
+        } else {
+            m = m+i - table[i];
+
+            if (i > 0) {
+                i = table[i];
+            }
+        }
+    }  
+}
+
+
+// BM法
+// BM法のずらし表を返す
+vector<int> BM_table(string W) {
+    vector<int> table(128, W.size());
+    int W_len = W.size();
+
+    for (int i = 0; i < W_len; i++) {
+        table[(int)W[i]] = min(table[(int)W[i]], W_len - 1 - i);
+    }
+
+    return table;
+}
+
+
+// 文字列Sから文字列Wを検索するBM法
+void BM_search(string S, string W) {
+    int W_len = W.size();
+
+    // Sの現在検索中の位置
+    int i = W_len-1;
+    // Wの現在検索中の位置
+    int j = W_len-1;
+
+    vector<int> table = BM_table(W);
+
+    while (i < S.size()) {
+        // 文字列が一致する間
+        while (W[j] == S[i]) {
+            // 全てが一致したとき出力
+            if (j == 0) {
+                cout << i << endl;
+                break;
+            } 
+
+            i--, j--;
+        }
+
+        // iを次の位置に動かし、jをリセット
+        i += max(W_len - j, table[(int)S[i]]);
+        j = W_len - 1;
+    }  
+}
 
 
 
