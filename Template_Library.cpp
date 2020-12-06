@@ -821,6 +821,30 @@ bool vector_finder(vector<int> vec, int number) {
     }
 
 
+// シンプルな文字列検索
+bool simple_search(string S, string T) {
+	int len_S = S.size(), len_T = T.size();
+
+	for (int i = 0; i < len_S - len_T + 1; i++) {
+		bool flag = true;
+
+		for (int k = 0; k < len_T; k++) {
+			if (S[i+k] != T[k]) {
+				flag = false;
+				break;
+			}
+		}
+
+		if (flag == true) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 // KMP法
 // KMP法のtableを返す
 vector<int> KMP_table(string W) {
@@ -1011,9 +1035,16 @@ long long modinv(long long a, long long m) {
 }
 
 
-int GCD(int a, int b) {
+
+// 最大公約数
+long long GCD(long long a, long long b) {
     if (b == 0) return a;
     else return GCD(b, a % b);
+}
+
+// 最小公倍数
+long long LCM(long long x, long long y) {
+	return x * y / GCD(x, y);
 }
 
 

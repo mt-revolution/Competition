@@ -27,7 +27,7 @@ unsigned long long hash_calc(vector<vector<int>> &A) {
     return h;
 }
 
-// ハッシュ値復元
+// ハッシュ値から復元
 vector<vector<int>> hash_restore(unsigned long long hash) {
     vector<vector<int>> A(3, vector<int>(3));
 
