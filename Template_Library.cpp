@@ -648,13 +648,13 @@ struct bfs {
 
 
 // 幅優先探索(二次元迷路の探索)
-struct bfs {
+struct Maze {
     vector<vector<vector<pair<int, int>>>> G;
     vector<vector<int>> distance;
 
-    bfs(int h, int w) {
+    Maze(int h, int w) {
         G.assign(h, vector<vector<pair<int, int>>>(w, vector<pair<int, int>>{}));
-        distance.assign(h, vector<int>(w, 0));
+        distance.assign(h, vector<int>(w, -1));
     };
 
     void make_edge(int ui, int uj, int vi, int vj) {
@@ -670,7 +670,7 @@ struct bfs {
         queue<pair<int, int>> node;
         int ui, uj;
 
-        distance[si][sj] = 1;
+        distance[si][sj] = 0;
         node.push(make_pair(si, sj));
 
         while (node.empty() == false) {
@@ -680,10 +680,63 @@ struct bfs {
 
             // (ui, uj) から行ける各マス (vi, vj) について再帰的に探索
             for (auto v : G[ui][uj]) { 
-                if (distance[v.first][v.second] == 0) {
+                if (distance[v.first][v.second] == -1) {
                     distance[v.first][v.second] = distance[ui][uj] + 1;
                     node.push(v);
                 }
+            }           
+        }
+    }
+};
+
+
+
+
+// 幅優先探索(二次元迷路の探索、移動のパターン有り)
+// 移動のパターン設定
+vector<vector<int>> idou = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+int H,W;
+
+struct Maze {
+    vector<vector<int>> distance;
+    vector<vector<char>> board;
+    // 障害物の文字設定
+    char obstacle = '#';
+
+    Maze(int h, int w) {
+        board.assign(h, vector<char>(w, 'E'));
+        distance.assign(h, vector<int>(w, -1));
+    };
+
+    void do_bfs(int si, int sj) {
+        // 始点が障害物なら何もしない
+        if (board[si][sj] == obstacle) {
+            return;
+        }
+
+        queue<pair<int, int>> node;
+        int ui, uj;
+
+        distance[si][sj] = 0;
+        node.push(make_pair(si, sj));
+
+        while (node.empty() == false) {
+            ui = node.front().first;
+            uj = node.front().second;
+            node.pop();
+
+            // (ui, uj) から行ける各マス (vi, vj) について再帰的に探索
+            for (auto vec : idou) { 
+                // 移動先がグリッドの範囲内かつ障害物がなくかつ距離をまだ計算していない場合に更新
+				if (ui + vec[0] >= 0 && ui + vec[0] < H && uj + vec[1] >= 0 && uj + vec[1] < W) {
+					if (board[ui + vec[0]][uj + vec[1]] != obstacle) {
+						if (distance[ui + vec[0]][uj + vec[1]] == -1) {
+							distance[ui + vec[0]][uj + vec[1]] = distance[ui][uj] + 1;
+							node.push(make_pair(ui + vec[0], uj + vec[1]));
+						}			
+					}	
+				}
             }           
         }
     }
@@ -1051,17 +1104,32 @@ long long LCM(long long x, long long y) {
 
 // n個からk個選ぶ組み合わせの場合の数nCk(nが大きいとオーバーフローする)
 vector<vector<long long>> comb(int n, int r) {
-  vector<vector<long long>> v(n + 1,vector<long long>(n + 1, 0));
-  for (int i = 0; i < v.size(); i++) {
-    v[i][0] = 1;
-    v[i][i] = 1;
-  }
-  for (int j = 1; j < v.size(); j++) {
-    for (int k = 1; k < j; k++) {
-      v[j][k] = (v[j - 1][k - 1] + v[j - 1][k]);
+    vector<vector<long long>> v(n + 1,vector<long long>(n + 1, 0));
+    for (int i = 0; i < v.size(); i++) {
+        v[i][0] = 1;
+        v[i][i] = 1;
     }
-  }
-  return v;
+    for (int j = 1; j < v.size(); j++) {
+        for (int k = 1; k < j; k++) {
+        v[j][k] = (v[j - 1][k - 1] + v[j - 1][k]);
+        }
+    }
+    return v;
+}
+
+
+long long comb(int n, int r) {
+    vector<vector<long long>> v(n + 1,vector<long long>(n + 1, 0));
+    for (int i = 0; i < v.size(); i++) {
+        v[i][0] = 1;
+        v[i][i] = 1;
+    }
+    for (int j = 1; j < v.size(); j++) {
+        for (int k = 1; k < j; k++) {
+        v[j][k] = (v[j - 1][k - 1] + v[j - 1][k]);
+        }
+    }
+    return v[n][r];
 }
 
 
@@ -1098,6 +1166,68 @@ long long COM(int n, int k){
 
 
 
+
+// 二項係数のmod計算(nが大きく固定されているとき)
+const long long MOD = 1000000007;
+
+const int MAX = 200001;
+
+vector<long long> fact_inv, inv, Com;
+
+// 初期化
+void init_nCk(long long n) {
+    fact_inv.resize(MAX);
+    inv.resize(MAX);
+    fact_inv[0] = fact_inv[1] = 1;
+    inv[1] = 1;
+    for (int i = 2; i < MAX; i++) {
+        inv[i] = MOD - inv[MOD % i] * (MOD / i) % MOD;
+        fact_inv[i] = fact_inv[i - 1] * inv[i] % MOD;
+    }
+    Com.resize(MAX);
+    Com[0] = 1;
+    for (int i = 1; i < MAX; i++) {
+        Com[i] = Com[i - 1] * ((n - i + 1) * inv[i] % MOD) % MOD;
+    }
+}
+
+/*  nCk :MODでの二項係数を求める(前処理 init_nCk が必要)
+    計算量:O(1)
+*/
+long long nCk(long long k) {
+    assert(!(k < 0));
+    return Com[k];
+}
+
+
+
+
+
+// 二項係数のmod計算(nが大きく、変化するとき)
+void init_nCk() {
+    fact_inv.resize(MAX);
+    inv.resize(MAX);
+    fact_inv[0] = fact_inv[1] = 1;
+    inv[1] = 1;
+    for (int i = 2; i < MAX; i++) {
+        inv[i] = MOD - inv[MOD % i] * (MOD / i) % MOD;
+        fact_inv[i] = fact_inv[i - 1] * inv[i] % MOD;
+    }
+}
+
+/*  nCk :MODでの二項係数を求める(前処理 int_nCk が必要)
+    計算量:O(k)
+*/
+long long nCk(long long n, long long k) {
+    assert(!(n < k));
+    assert(!(n < 0 || k < 0));
+    long long ans = 1;
+    for (long long i = n; i >= n - k + 1; i--) {
+        ans *= i;
+        ans %= MOD;
+    }
+    return ans * fact_inv[k] % MOD;
+}
 
 
 
