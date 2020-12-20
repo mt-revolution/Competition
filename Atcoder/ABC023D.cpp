@@ -2,11 +2,6 @@
 
 using namespace std;
 
-// 整数値のa/bの切り上げ値を求める
-long long int_ceil(long long a, long long b) {
-	return (a+(b-1))/b;
-}
-
 
 int main() {
 	int N;
