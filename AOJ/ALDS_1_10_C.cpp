@@ -10,8 +10,6 @@ int main() {
     vector<string> X(q), Y(q);
     int X_size, Y_size;
 
-    vector<int> tmp(3, 0);
-
     for(int i = 0; i < q; i++) {
         cin >> X[i];
         cin >> Y[i];
@@ -31,12 +29,7 @@ int main() {
         for(int i = 1; i <= X_size; i++) {
             for(int j = 1; j <= Y_size; j++) {
                 if(X[k][i-1] == Y[k][j-1]) {
-                    tmp = {};
-                    tmp.push_back(dp[i-1][j-1] + 1);
-                    tmp.push_back(dp[i-1][j]);
-                    tmp.push_back(dp[i][j-1]);
-                    sort(tmp.begin(), tmp.end());
-                    dp[i][j] = tmp.back();
+                    dp[i][j] = max({dp[i-1][j-1] + 1, dp[i-1][j], dp[i][j-1]});
                 } else {
                     dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
                 }

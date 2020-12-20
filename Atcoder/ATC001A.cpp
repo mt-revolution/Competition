@@ -3,46 +3,35 @@
 using namespace std;
 int H, W;
 
-bool is_valid_move(vector<vector<char>> &board, vector<vector<bool>> &checked, int x, int y) {
-    if(x >= H || x < 0 || y >= W || y < 0) {
+vector<vector<int>> idou = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+// (x,y)に移動できるか
+bool is_valid_move(vector<vector<char>> &board, vector<vector<bool>> &checked, int i, int j) {
+    if(i >= H || i < 0 || j >= W || j < 0) {
         return false;
     }
 
-    if(checked.at(x).at(y) == true || board.at(x).at(y) == '#') {
+    if(checked.at(i).at(j) == true || board.at(i).at(j) == '#') {
         return false;
     }
 
     return true;
 }
 
-bool is_reachable(vector<vector<char>> &board, vector<vector<bool>> &checked, int x, int y) {
-    checked.at(x).at(y) = true;
+// (x,y)から出発してゴールに辿り着けるか
+bool is_reachable(vector<vector<char>> &board, vector<vector<bool>> &checked, int i, int j) {
+    checked.at(i).at(j) = true;
 
-    if(board.at(x).at(y) == 'g') {
+    if(board.at(i).at(j) == 'g') {
         return true;
     }
 
-    if(is_valid_move(board, checked, x-1, y) == true) {
-        if(is_reachable(board, checked, x-1, y) == true) {
-            return true;
-        }
-    }
-
-    if(is_valid_move(board, checked, x+1, y) == true) {
-        if(is_reachable(board, checked, x+1, y) == true) {
-            return true;
-        }
-    }
-
-    if(is_valid_move(board, checked, x, y-1) == true) {
-        if(is_reachable(board, checked, x, y-1) == true) {
-            return true;
-        }
-    }
-
-    if(is_valid_move(board, checked, x, y+1) == true) {
-        if(is_reachable(board, checked, x, y+1) == true) {
-            return true;
+    // 上下左右に移動できるなら移動する
+    for (int k = 0; k < 4; k++) {
+        if(is_valid_move(board, checked, i + idou[k][0], j + idou[k][1]) == true) {
+            if(is_reachable(board, checked, i + idou[k][0], j + idou[k][1]) == true) {
+                return true;
+            }
         }
     }
 
@@ -50,37 +39,26 @@ bool is_reachable(vector<vector<char>> &board, vector<vector<bool>> &checked, in
 } 
 
 int main() {
-
     cin >> H >> W;
 
     vector<vector<char>> board(H, vector<char>(W));
     vector<vector<bool>> checked(H, vector<bool>(W, false));
-    bool finished = false;
+    int si, sj;
 
     for(int i = 0; i < H; i++) {
         for(int j = 0; j < W; j++) {
             cin >> board.at(i).at(j);
+
+            if (board[i][j] == 's') {
+                si = i, sj = j;
+            }
         }
     }
 
-    for(int i = 0; i < H; i++) {
-        for(int j = 0; j < W; j++) {
-            if(board.at(i).at(j) == 's') {
-                if(is_reachable(board, checked, i, j) == true) {
-                    cout << "Yes" << endl;
-                    finished = true;
-                    break;
-                } else {
-                    cout << "No" << endl;
-                    finished = true;
-                    break;
-                }
-            }
-        }
-
-        if(finished == true) {
-            break;
-        }
+    if(is_reachable(board, checked, si, sj) == true) {
+        cout << "Yes" << endl;
+    } else {
+        cout << "No" << endl;
     }
 
 	return 0;

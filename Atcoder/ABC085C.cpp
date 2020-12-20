@@ -3,36 +3,22 @@
 using namespace std;
 
 int main() {
-	int N;
-	int Y;
-	int x = 0;
-	int y = 0;
-	int z = 0;
+	int N,Y;
 	cin >> N >> Y;
+	
+	int z;
+	
+	for (int x = 0; x <= 2000; x++) {
+		for (int y = 0; y <= 4000; y++) {
+			z = N - (x+y);
 
-	if (Y / 1000 >= N && Y / 10000 <= N) {
-		for (x = 0; x <= N; x++) {
-			for (y = 0; y <= N - x; y++) {
-				z = N - x - y;
-				if (10000 * x + 5000 * y + 1000 * z == Y) {
-					goto RESULT;
-				}
+			if (z >= 0 && 1000*z == Y - (10000*x + 5000*y)) {
+				cout << x << " " << y << " " << z << endl;
+				return 0;
 			}
 		}
-		x = -1;
-		y = -1;
-		z = -1;
-		goto RESULT;
-	}
-	else {
-		x = -1;
-		y = -1;
-		z = -1;
-		goto RESULT;
 	}
 
-RESULT:
-	cout << x << " " << y << " " << z << endl;
-
+	cout << -1 << " " << -1 << " " << -1 << endl;
 	return 0;
 }

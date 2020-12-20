@@ -33,6 +33,7 @@ int main() {
 
 	auto iter1 = upper_bound(P_twice.begin(), P_twice.end(), M);
 
+	// 半分全列挙
 	for(auto iteri = P_twice.begin(); iteri < iter1; iteri++) {
 		current_point = *iteri;
 		if(current_point <= M) {

@@ -839,14 +839,14 @@ bool vector_finder(vector<int> vec, int number) {
 
 
     // おつりの枚数計算
-    vector<int> coins = {25, 10, 5, 1};
-
     // 初期値
-    int tmp = n;
+    int change = 1000 - N;
+    vector<int> coin = {500, 100, 50, 10, 5, 1};
+    int answer = 0;
 
-    for (auto coin : coins) {
-        answer += tmp / coin;
-        tmp -= coin * (tmp / coin);
+    for (auto i : coin) {
+        answer += change / i;
+        change %= i;
     }
 
 
@@ -1050,6 +1050,29 @@ bool is_prime(long long N) {
 
 
 
+// 最長増加部分列(LIS)の大きさ
+int LIS(vector<int> a) {
+	// 最長増加部分列問題の数列の長さがiのときの最終要素の最小値のペアdp[i]
+	vector<int> dp(N+1, INF);
+	int n = a.size();
+
+	for (int i = 0; i < n; i++) {
+		*lower_bound(dp.begin(), dp.begin() + n, a[i]) = a[i];
+	}
+	return lower_bound(dp.begin(), dp.begin() + n, INF) - dp.begin();
+}
+
+
+// pairのfirstで昇順ソート、firstが同じ場合はsecondで降順ソート
+bool cmp(const pair<int, int> &a, const pair<int, int> &b) {
+	if (a.first < b.first) return true;
+	else if (a.first > b.first) return false;
+	else if (a.second > b.second) return true;
+	else return false;
+}
+
+
+
 // べき乗の余り計算
 long long modpow(long long a, long long n, long long mod) {
     long long res = 1;
@@ -1200,6 +1223,11 @@ long long nCk(long long k) {
 }
 
 
+
+// 整数値のa/bの切り上げ値を求める
+int int_ceil(int a, int b) {
+	return (a+(b-1))/b;
+}
 
 
 

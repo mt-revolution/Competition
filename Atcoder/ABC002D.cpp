@@ -6,21 +6,22 @@ int main() {
     int N, M;
     cin >> N >> M;
 
-    vector<int> x(M);
-    vector<int> y(M);
+    int x,y;
     vector<vector<bool>> friends(N, vector<bool>(N, false));
-    vector<int> tmp = {};
+    vector<int> tmp;
     int tmp_size;
-    int max_group = 1;
-    bool continued = false;
+    int max_group = 0;
+    bool flag;
 
     for(int i = 0; i < M; i++) {
-        cin >> x[i] >> y[i];
-        friends[x[i]-1][y[i]-1] = true;
+        cin >> x >> y;
+        x--, y--;
+        friends[x][y] = true;
     }
 
+    // 派閥を作っている人の組み合わせでbit全探索
     for(int biti = 1; biti < (1<<N); biti++) {
-        continued = false;
+        flag = true;
         tmp = {};
         
         for(int i = 0; i < N; i++) {
@@ -29,24 +30,25 @@ int main() {
             }
         }
 
-        sort(tmp.begin(), tmp.end());
         tmp_size = tmp.size();
 
+        // 派閥の中が全員ちゃんと知り合いかどうか調べる
         for(int i = 0; i < tmp_size-1; i++) {
             for(int j = i+1; j < tmp_size; j++) {
                 if(friends[tmp[i]][tmp[j]] == false) {
-                    continued = true;
-                    goto COUNT;
+                    flag = false;
+                    break;
                 }
+            }
+
+            if (flag == false) {
+                break;
             }
         }
 
-        COUNT:
-        if(continued == true) {
-            continue;
+        if(flag == true) {
+            max_group = max(max_group, tmp_size);
         }
-
-        max_group = max(max_group, tmp_size);
     }
 
     cout << max_group << endl;
