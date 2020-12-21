@@ -1064,13 +1064,21 @@ int LIS(vector<int> a) {
 
 
 // pairのfirstで昇順ソート、firstが同じ場合はsecondで降順ソート
-bool cmp(const pair<int, int> &a, const pair<int, int> &b) {
+bool comp(const pair<int, int> &a, const pair<int, int> &b) {
 	if (a.first < b.first) return true;
 	else if (a.first > b.first) return false;
 	else if (a.second > b.second) return true;
 	else return false;
 }
 
+// pairの2番目の値で昇順ソート
+bool comp(pair<int, int> a, pair<int, int> b) {
+    if(a.second != b.second){
+        return a.second < b.second;
+    }else{
+        return a.first < b.first;
+    }
+}
 
 
 // べき乗の余り計算
