@@ -22,24 +22,6 @@ int main() {
         cin >> A[i] >> B[i] >> C[i];
     }
 
-    // 初期条件
-
-    // for(int j = 1; j <= N; j++) {
-    //     if(T[1] >= A[j] && T[1] <= B[j]) {
-    //         dp[1][j] = max(dp[1][j], C[j]);
-    //     }
-    // }
-
-    // for(int j = 1; j <= N; j++) {
-    //     if(T[2] >= A[j] && T[2] <= B[j]) {
-    //         for(int k = 1; k <= N; k++) {
-    //             if(T[1] >= A[k] && T[1] <= B[k]) {
-    //                 dp[2][j] = max(dp[2][j], abs(C[k] - C[j]));
-    //             }
-    //         }
-    //     }
-    // }
-
     // dp開始
     for(int i = 2; i <= D; i++) {
         for(int j = 1; j <= N; j++) {
